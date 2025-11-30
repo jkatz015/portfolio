@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.env
+*.egg-info/
+dist/
+build/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Data files (keep structure, ignore large files)
+*.csv
+*.xlsx
+*.xls
+*.parquet
+*.pickle
+*.pkl
+!*/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tableau
+*.twbx
+*.hyper
+
+# Secrets
+.env
+.env.local
+*.pem
+credentials.json
+
+# Logs
+*.log
+logs/
+
+# Temporary
+tmp/
+temp/
+*.tmp
