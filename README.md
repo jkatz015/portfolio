@@ -27,7 +27,7 @@ Develop a professional portfolio demonstrating expertise in:
 | # | Project | Status | Description |
 |---|---------|--------|-------------|
 | 1 | [Pizza Sales Revenue Forecasting](./projects/project-01-revenue-forecasting/) | **Complete** | Time series forecasting using R (ARIMA) |
-| 2 | [AP/Invoice Automation](./projects/project-02-ap-automation/) | Not Started | OCR + validation + anomaly detection pipeline |
+| 2 | [Invoice Anomaly Detection](./projects/project-02-ap-automation/) | Not Started | Excel Power Query + VBA tool to flag suspicious AP transactions |
 | 3 | [Executive Dashboard](./projects/project-03-executive-dashboard/) | Not Started | CFO-ready Tableau/Power BI dashboard |
 | 4 | [Financial Modeling](./projects/project-04-financial-modeling/) | Not Started | Multi-scenario 3-5 year projection model |
 | 5 | [Finance Copilot App](./projects/project-05-finance-copilot-app/) | Not Started | Streamlit app: upload → clean → analyze → visualize |
@@ -82,13 +82,18 @@ project-XX-name/
 - [x] Generate final report (HTML + PDF)
 - [x] Document lessons learned (Christmas seasonality)
 
-### Phase 3: Project 2 — AP Automation
-- [ ] Obtain invoice dataset
-- [ ] Build OCR extraction pipeline
-- [ ] Create validation rules
-- [ ] Implement anomaly detection
-- [ ] Build Streamlit demo app
-- [ ] Document workflow
+### Phase 3: Project 2 — Invoice Anomaly Detection
+- [ ] Find AP/invoice transaction dataset on Kaggle
+- [ ] Build Power Query data cleaning pipeline
+- [ ] Create anomaly detection rules:
+  - Duplicate invoices (same vendor + amount + date)
+  - Unusual amounts (outliers vs. vendor history)
+  - Round number amounts (fraud indicator)
+  - Weekend/holiday invoice dates
+  - New/inactive vendor activity
+- [ ] Write VBA script to automate checks
+- [ ] Create summary dashboard in Excel
+- [ ] Document methodology and business logic
 
 ### Phase 4: Project 3 — Executive Dashboard
 - [ ] Select dataset (Superstore or similar)

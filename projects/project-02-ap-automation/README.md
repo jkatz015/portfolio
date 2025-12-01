@@ -1,6 +1,6 @@
-# Project 2: AP/Invoice Automation
+# Project 2: Invoice Anomaly Detection
 
-> Automated invoice processing pipeline with OCR extraction, validation, and anomaly detection.
+> Excel-based tool using Power Query and VBA to automatically flag suspicious AP transactions.
 
 **Status:** Not Started
 
@@ -8,90 +8,113 @@
 
 ## Problem Statement
 
-Accounts Payable teams manually process hundreds of invoices monthly, leading to:
-- Data entry errors (2-5% error rate typical)
-- Duplicate payments
-- Missed early payment discounts
-- Slow processing times (days vs. hours)
-- Fraud vulnerability
+Accounts Payable teams process thousands of invoices monthly, and manual review can't catch everything:
+- Duplicate payments cost companies 0.1-0.5% of revenue
+- Fraudulent invoices often slip through
+- Unusual patterns go unnoticed until audit
+- Manual spot-checking is time-consuming and inconsistent
 
-**Goal:** Build an automated pipeline that extracts invoice data, validates against vendor master, and flags anomalies.
+**Goal:** Build an Excel tool that automatically scans AP transaction data and flags suspicious invoices for review.
+
+---
+
+## Questions We're Answering
+
+1. **Are there duplicate invoices?** (same vendor + amount + date)
+2. **Are there unusual amounts?** (outliers vs. vendor history)
+3. **Are there suspicious timing patterns?** (invoices on weekends, holidays, month-end)
+4. **Are there round number red flags?** ($5,000.00 exactly — common fraud indicator)
+5. **Are there vendor anomalies?** (new vendors, inactive vendors suddenly billing)
+6. **What's the overall health of the AP process?** (summary metrics)
 
 ---
 
 ## Dataset
 
-**Source:** Synthetic invoice dataset (TBD)
+**Source:** Kaggle AP/Invoice transaction dataset (TBD)
 
-| Component | Description |
-|-----------|-------------|
-| Invoice images/PDFs | Sample invoices for OCR |
-| Vendor master | Approved vendors with payment terms |
-| Historical payments | Past invoice payments for anomaly baseline |
+| Column | Description |
+|--------|-------------|
+| invoice_id | Unique invoice identifier |
+| vendor_id | Vendor identifier |
+| vendor_name | Vendor name |
+| invoice_date | Date of invoice |
+| due_date | Payment due date |
+| amount | Invoice amount |
+| gl_code | General ledger code |
+| payment_date | Date paid (if paid) |
+| status | Paid, pending, etc. |
 
 ---
 
 ## Tools & Skills Demonstrated
 
 ### Technical
-- Python (pandas, numpy)
-- OCR (pytesseract, OpenCV)
-- Regular expressions for data extraction
-- Anomaly detection (Isolation Forest, statistical methods)
-- Streamlit (demo app)
+- Excel Power Query (data cleaning, transformation)
+- Excel VBA (automation)
+- Conditional formatting (visual flags)
+- Pivot tables (summary analysis)
+- Statistical outlier detection
 
-### Financial Concepts
-- AP workflow automation
-- Three-way matching (PO, receipt, invoice)
-- Duplicate detection
-- Vendor validation
-- Payment term optimization
+### Financial/Business Concepts
+- AP workflow and controls
+- Duplicate payment detection
+- Fraud indicators (Benford's Law, round numbers)
+- Vendor management
+- Internal controls
 
 ---
 
 ## Methodology
 
-### 1. Invoice Data Extraction
-- [ ] Set up OCR pipeline (pytesseract)
-- [ ] Extract key fields:
-  - Vendor name
-  - Invoice number
-  - Invoice date
-  - Due date
-  - Line items
-  - Total amount
-- [ ] Handle multiple invoice formats
+### 1. Data Import & Cleaning (Power Query)
+- [ ] Import transaction data
+- [ ] Standardize vendor names
+- [ ] Parse dates correctly
+- [ ] Handle missing values
+- [ ] Create calculated columns (day of week, month, etc.)
 
-### 2. Data Validation
-- [ ] Match vendor to master file
-- [ ] Validate invoice number format
-- [ ] Check for duplicates
-- [ ] Verify GL code mapping
-- [ ] Flag missing required fields
+### 2. Anomaly Detection Rules
+- [ ] **Duplicates:** Same vendor + amount + date (±3 days)
+- [ ] **Outliers:** Amount > 2 standard deviations from vendor average
+- [ ] **Round numbers:** Amounts ending in 000 or 00
+- [ ] **Weekend invoices:** Invoice date falls on Saturday/Sunday
+- [ ] **New vendors:** Vendor not in historical master list
+- [ ] **Inactive vendors:** No activity in 6+ months, then sudden invoice
 
-### 3. Anomaly Detection
-- [ ] Unusual amounts (vs. vendor history)
-- [ ] Suspicious timing patterns
-- [ ] Duplicate invoice detection
-- [ ] New vendor alerts
+### 3. VBA Automation
+- [ ] One-click button to run all checks
+- [ ] Generate flagged items on new sheet
+- [ ] Color-code by severity (red = high, yellow = medium)
+- [ ] Summary count of flags by type
 
-### 4. Demo Application
-- [ ] Streamlit upload interface
-- [ ] Real-time extraction display
-- [ ] Validation status dashboard
-- [ ] Export to CSV/Excel
+### 4. Dashboard
+- [ ] Total invoices scanned
+- [ ] Number of flags by category
+- [ ] Top flagged vendors
+- [ ] Trend over time (if multiple periods)
 
 ---
 
 ## Deliverables
 
-- [ ] `notebooks/01_ocr_extraction.ipynb` — OCR pipeline development
-- [ ] `notebooks/02_validation_rules.ipynb` — Validation logic
-- [ ] `notebooks/03_anomaly_detection.ipynb` — Anomaly model
-- [ ] `src/invoice_processor.py` — Main processing module
-- [ ] `src/validators.py` — Validation functions
-- [ ] `app/streamlit_app.py` — Demo application
-- [ ] `reports/ap_automation_report.pdf` — Process documentation
+- [ ] `Invoice_Anomaly_Detector.xlsm` — Main Excel tool with Power Query + VBA
+- [ ] `data/sample_transactions.csv` — Sample dataset
+- [ ] `reports/anomaly_detection_report.pdf` — Methodology documentation
+- [ ] `README.md` — This file with instructions
+
+---
+
+## How It Works (User Flow)
+
+```
+1. User opens Excel file
+2. Pastes or imports AP transaction data
+3. Clicks "Run Anomaly Check" button
+4. Tool scans data and flags suspicious items
+5. Results appear on "Flagged Items" sheet
+6. Dashboard shows summary metrics
+```
 
 ---
 
@@ -99,24 +122,25 @@ Accounts Payable teams manually process hundreds of invoices monthly, leading to
 
 *To be completed after development*
 
-- Processing time savings
-- Error reduction rate
-- Anomaly detection accuracy
-- ROI calculation
+- Number of duplicates caught
+- Estimated cost savings
+- Time saved vs. manual review
+- False positive rate
 
 ---
 
 ## Future Enhancements
 
-- Integration with ERP systems (SAP, Oracle)
-- Machine learning for GL code prediction
-- Email ingestion for invoice receipt
-- Approval workflow automation
-- Advanced document AI (Azure Form Recognizer, AWS Textract)
+- Benford's Law analysis for first-digit distribution
+- Machine learning anomaly detection (Python integration)
+- Email alert for high-severity flags
+- Integration with accounting software exports
+- Historical trend tracking
 
 ---
 
 ## References
 
-- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract)
-- [OpenCV Python](https://docs.opencv.org/4.x/d6/d00/tutorial_py_root.html)
+- [ACFE Fraud Prevention](https://www.acfe.com/)
+- [Benford's Law for Fraud Detection](https://en.wikipedia.org/wiki/Benford%27s_law)
+- [Excel Power Query Documentation](https://docs.microsoft.com/en-us/power-query/)
