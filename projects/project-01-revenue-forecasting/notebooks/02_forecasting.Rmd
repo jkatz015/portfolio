@@ -1,0 +1,359 @@
+---
+title: "Pizza Sales Revenue Forecasting"
+author: "Jonathan Katz"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 10,
+  fig.height = 5
+)
+```
+
+# Introduction
+
+**Question:** What will total sales revenue be for the next 7 days?
+
+In the EDA notebook, we explored sales patterns by hour, day of week, pizza type, and size. Now we'll build a time series forecast to predict the next 7 days of revenue.
+
+**Approach:**
+
+1. Aggregate daily revenue
+2. Visualize the time series
+3. Fit a forecasting model
+4. Predict the next 7 days
+5. Evaluate accuracy
+
+---
+
+# Setup & Load Data
+
+```{r load-libraries}
+# Load libraries
+library(tidyverse)
+library(lubridate)
+library(scales)
+library(readxl)
+library(forecast)  # For ARIMA and forecasting
+library(knitr)
+library(kableExtra)
+
+# Set theme
+theme_set(theme_minimal(base_size = 12))
+```
+
+```{r load-data}
+# Load pizza sales data
+pizza <- read_excel("../data/raw/Data Model - Pizza Sales.xlsx")
+
+# Clean dates
+pizza <- pizza %>%
+  mutate(order_date = as.Date(order_date))
+
+cat("Data loaded:", nrow(pizza), "rows\n")
+cat("Date range:", as.character(min(pizza$order_date)), "to", as.character(max(pizza$order_date)))
+```
+
+---
+
+# Step 1: What does our daily revenue look like?
+
+```{r aggregate-daily}
+# Aggregate to daily revenue
+daily_revenue <- pizza %>%
+  group_by(order_date) %>%
+  summarise(
+    revenue = sum(total_price),
+    orders = n_distinct(order_id),
+    pizzas = sum(quantity),
+    .groups = "drop"
+  ) %>%
+  arrange(order_date)
+
+# Preview
+daily_revenue %>%
+  head(10) %>%
+  kable(format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+```{r summary-stats}
+cat("Daily Revenue Summary:\n")
+cat("- Total days:", nrow(daily_revenue), "\n")
+cat("- Average daily revenue: $", round(mean(daily_revenue$revenue), 2), "\n")
+cat("- Min daily revenue: $", round(min(daily_revenue$revenue), 2), "\n")
+cat("- Max daily revenue: $", round(max(daily_revenue$revenue), 2), "\n")
+```
+
+```{r plot-daily-revenue}
+daily_revenue %>%
+  ggplot(aes(x = order_date, y = revenue)) +
+  geom_line(color = "steelblue", linewidth = 0.5) +
+  geom_smooth(method = "loess", color = "red", se = FALSE, linewidth = 1) +
+  labs(
+    title = "What does our daily revenue look like?",
+    subtitle = "Daily revenue with trend line (2015)",
+    x = "Date",
+    y = "Daily Revenue ($)"
+  ) +
+  scale_y_continuous(labels = dollar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b")
+```
+
+**Observation:** Revenue is relatively stable around $2,000-2,500 per day with weekly fluctuations. No strong upward or downward trend.
+
+---
+
+# Step 2: Is there a weekly pattern in revenue?
+
+```{r weekly-pattern}
+# Add day of week
+daily_revenue <- daily_revenue %>%
+  mutate(day_of_week = wday(order_date, label = TRUE, week_start = 1))
+
+# Average by day of week
+weekly_pattern <- daily_revenue %>%
+  group_by(day_of_week) %>%
+  summarise(avg_revenue = mean(revenue), .groups = "drop")
+
+weekly_pattern %>%
+  ggplot(aes(x = day_of_week, y = avg_revenue, fill = avg_revenue)) +
+  geom_col(alpha = 0.8, show.legend = FALSE) +
+  geom_text(aes(label = dollar(avg_revenue, accuracy = 1)), vjust = -0.5, size = 3.5) +
+  scale_fill_gradient(low = "lightblue", high = "steelblue") +
+  labs(
+    title = "Is there a weekly pattern in revenue?",
+    subtitle = "Average daily revenue by day of week",
+    x = "Day of Week",
+    y = "Average Revenue ($)"
+  ) +
+  scale_y_continuous(labels = dollar, expand = expansion(mult = c(0, 0.1)))
+```
+
+**Observation:** Friday is the highest revenue day. Sunday is the lowest. This weekly pattern is important for our forecast.
+
+---
+
+# Step 3: How do we prepare the data for forecasting?
+
+```{r create-time-series}
+# Create a time series object
+# We need a complete sequence of dates (no gaps)
+
+# Check for missing dates
+date_range <- seq(min(daily_revenue$order_date), max(daily_revenue$order_date), by = "day")
+missing_dates <- date_range[!date_range %in% daily_revenue$order_date]
+
+cat("Missing dates:", length(missing_dates), "\n")
+
+# If there are missing dates, fill them with 0 or interpolate
+if (length(missing_dates) > 0) {
+  complete_dates <- tibble(order_date = date_range) %>%
+    left_join(daily_revenue, by = "order_date") %>%
+    mutate(revenue = replace_na(revenue, 0))
+  daily_revenue <- complete_dates
+}
+
+# Create ts object (frequency = 7 for weekly seasonality)
+revenue_ts <- ts(daily_revenue$revenue, frequency = 7)
+
+cat("Time series created with", length(revenue_ts), "observations\n")
+cat("Frequency: 7 (weekly)\n")
+```
+
+---
+
+# Step 4: What forecast model should we use?
+
+We'll use **ARIMA** (AutoRegressive Integrated Moving Average) with automatic parameter selection. R's `auto.arima()` function finds the best parameters.
+
+```{r fit-model}
+# Fit ARIMA model with automatic parameter selection
+# Using the first 358 days for training, last 7 for testing
+train_end <- nrow(daily_revenue) - 7
+train_ts <- ts(daily_revenue$revenue[1:train_end], frequency = 7)
+test_data <- daily_revenue$revenue[(train_end + 1):nrow(daily_revenue)]
+
+# Fit model
+model <- auto.arima(train_ts)
+
+# Model summary
+summary(model)
+```
+
+```{r model-info}
+cat("\nModel selected:", paste(model$arma, collapse = ","), "\n")
+cat("This model accounts for:\n")
+cat("- Autoregressive patterns (past values influence future)\n")
+cat("- Moving average of errors\n")
+cat("- Weekly seasonality\n")
+```
+
+---
+
+# Step 5: What will revenue be for the next 7 days?
+
+```{r forecast}
+# Generate 7-day forecast
+forecast_result <- forecast(model, h = 7)
+
+# Create forecast table
+forecast_table <- tibble(
+  Day = 1:7,
+  Date = max(daily_revenue$order_date[1:train_end]) + 1:7,
+  Day_of_Week = wday(Date, label = TRUE),
+  Forecast = round(forecast_result$mean, 2),
+  Lower_95 = round(forecast_result$lower[, 2], 2),
+  Upper_95 = round(forecast_result$upper[, 2], 2),
+  Actual = test_data
+)
+
+forecast_table %>%
+  kable(
+    col.names = c("Day", "Date", "Day of Week", "Forecast ($)", "Lower 95% CI", "Upper 95% CI", "Actual ($)"),
+    format.args = list(big.mark = ",")
+  ) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered"))
+```
+
+```{r forecast-totals}
+total_forecast <- sum(forecast_result$mean)
+total_actual <- sum(test_data)
+
+cat("\n7-Day Totals:\n")
+cat("- Forecasted revenue: $", comma(round(total_forecast, 2)), "\n")
+cat("- Actual revenue: $", comma(round(total_actual, 2)), "\n")
+cat("- Difference: $", comma(round(total_actual - total_forecast, 2)),
+    " (", round((total_actual - total_forecast) / total_actual * 100, 1), "%)\n")
+```
+
+---
+
+# Step 6: How accurate is our forecast?
+
+```{r accuracy-metrics}
+# Calculate accuracy metrics
+errors <- test_data - forecast_result$mean
+
+mae <- mean(abs(errors))
+rmse <- sqrt(mean(errors^2))
+mape <- mean(abs(errors / test_data)) * 100
+
+accuracy_table <- tibble(
+  Metric = c("MAE (Mean Absolute Error)", "RMSE (Root Mean Square Error)", "MAPE (Mean Absolute % Error)"),
+  Value = c(paste0("$", round(mae, 2)), paste0("$", round(rmse, 2)), paste0(round(mape, 2), "%")),
+  Interpretation = c(
+    "On average, we're off by this amount",
+    "Penalizes larger errors more heavily",
+    "Average percentage error"
+  )
+)
+
+accuracy_table %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered"))
+```
+
+---
+
+# Step 7: What does the forecast look like visually?
+
+```{r plot-forecast, fig.height=6}
+# Prepare data for plotting
+plot_data <- daily_revenue %>%
+  filter(order_date >= max(order_date) - 60) %>%  # Last 60 days
+  mutate(type = "Actual")
+
+forecast_plot_data <- tibble(
+  order_date = max(daily_revenue$order_date[1:train_end]) + 1:7,
+  revenue = as.numeric(forecast_result$mean),
+  lower = as.numeric(forecast_result$lower[, 2]),
+  upper = as.numeric(forecast_result$upper[, 2]),
+  type = "Forecast"
+)
+
+# Plot
+ggplot() +
+  # Actual data
+  geom_line(data = plot_data, aes(x = order_date, y = revenue),
+            color = "steelblue", linewidth = 0.8) +
+  # Confidence interval
+  geom_ribbon(data = forecast_plot_data, aes(x = order_date, ymin = lower, ymax = upper),
+              fill = "coral", alpha = 0.3) +
+  # Forecast line
+  geom_line(data = forecast_plot_data, aes(x = order_date, y = revenue),
+            color = "coral", linewidth = 1.2) +
+  geom_point(data = forecast_plot_data, aes(x = order_date, y = revenue),
+             color = "coral", size = 3) +
+  # Actual test data points
+  geom_point(data = tibble(order_date = forecast_plot_data$order_date, revenue = test_data),
+             aes(x = order_date, y = revenue), color = "darkgreen", size = 3, shape = 17) +
+  labs(
+    title = "What will revenue be for the next 7 days?",
+    subtitle = "Blue = historical data, Coral = forecast with 95% confidence interval, Green triangles = actual",
+    x = "Date",
+    y = "Daily Revenue ($)"
+  ) +
+  scale_y_continuous(labels = dollar) +
+  scale_x_date(date_breaks = "1 week", date_labels = "%b %d")
+```
+
+---
+
+# Summary
+
+## What did we learn?
+
+```{r summary-findings}
+cat("
+================================================================================
+                           FORECASTING SUMMARY
+================================================================================
+
+QUESTION: What will total sales revenue be for the next 7 days?
+
+ANSWER: We forecast approximately $", comma(round(total_forecast)), " in revenue.
+
+MODEL PERFORMANCE:
+- MAPE: ", round(mape, 1), "% (average prediction error)
+- MAE: $", round(mae, 2), " (average daily error)
+
+KEY INSIGHTS:
+1. Daily revenue averages around $", comma(round(mean(daily_revenue$revenue))), "
+2. Weekly seasonality is significant (Friday highest, Sunday lowest)
+3. The model captures the weekly pattern effectively
+
+BUSINESS RECOMMENDATIONS:
+1. Use this forecast for weekly inventory ordering
+2. Schedule more staff on Fridays, fewer on Sundays
+3. Run promotions on slow days to smooth out demand
+4. Re-run forecast weekly for updated predictions
+
+================================================================================
+", sep = "")
+```
+
+---
+
+# Next Steps
+
+To improve this forecast, we could:
+
+1. **Add external features** — holidays, weather, local events
+2. **Try other models** — Prophet, ETS, or machine learning approaches
+3. **Extend horizon** — forecast 14 or 30 days ahead
+4. **Automate** — create a script that runs weekly and emails the forecast
+
+---
+
+*Forecast completed on `r Sys.Date()`*

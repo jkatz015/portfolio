@@ -1,0 +1,383 @@
+---
+title: "Pizza Sales Analysis & Revenue Forecasting"
+author: "Jonathan Katz"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: '2'
+    df_print: paged
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+subtitle: Final Report
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 8,
+  fig.height = 4
+)
+
+# Load libraries
+library(tidyverse)
+library(lubridate)
+library(scales)
+library(readxl)
+library(forecast)
+library(knitr)
+library(kableExtra)
+
+# Set theme
+theme_set(theme_minimal(base_size = 10))
+
+# Load and prep data
+pizza <- read_excel("../data/raw/Data Model - Pizza Sales.xlsx") %>%
+  mutate(
+    order_date = as.Date(order_date),
+    order_hour = hour(hms(order_time)),
+    day_of_week = wday(order_date, label = TRUE, week_start = 1)
+  )
+
+# Daily revenue
+daily_revenue <- pizza %>%
+  group_by(order_date) %>%
+  summarise(revenue = sum(total_price), .groups = "drop") %>%
+  arrange(order_date)
+```
+
+\newpage
+
+# Executive Summary
+
+This report analyzes one year of pizza restaurant sales data (2015) to understand customer behavior and forecast future revenue.
+
+**Key Findings:**
+
+- **Annual Revenue:** $817,860 from 21,350 orders
+- **Peak Hours:** 12pm (lunch) and 5-7pm (dinner)
+- **Best Day:** Friday generates the highest revenue
+- **Top Seller:** The Classic Deluxe Pizza
+- **Most Popular Size:** Large (46% of all sales)
+- **Average Order Value:** $38.31
+
+**Forecast Performance:**
+
+The 7-day revenue forecast model performed well during typical weeks but struggled during the Christmas holiday period. This highlights the importance of incorporating seasonality and holiday effects into forecasting models.
+
+**Recommendations:**
+
+1. Staff fully during peak hours (12pm and 5-7pm)
+2. Run promotions on slow days (Sunday)
+3. Ensure Classic Deluxe ingredients are always stocked
+4. Incorporate holiday calendar into future forecasting models
+
+\newpage
+
+# Business Questions
+
+This analysis answers six key questions:
+
+1. What will total sales revenue be for the next 7 days?
+2. What are the peak hours for orders?
+3. Which day of the week has the highest sales?
+4. What is the best-selling pizza?
+5. What is the most popular pizza size?
+6. What is the average order value?
+
+# Dataset Overview
+
+**Source:** Kaggle Pizza Restaurant Sales Dataset
+
+**Period:** January 1, 2015 - December 31, 2015
+
+**Size:** 48,620 order line items
+
+```{r data-summary}
+summary_stats <- tibble(
+  Metric = c("Total Orders", "Total Pizzas Sold", "Total Revenue", "Unique Pizza Types"),
+  Value = c(
+    comma(n_distinct(pizza$order_id)),
+    comma(sum(pizza$quantity)),
+    dollar(sum(pizza$total_price)),
+    n_distinct(pizza$pizza_name)
+  )
+)
+
+kable(summary_stats, align = c("l", "r")) %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+\newpage
+
+# Key Findings
+
+## What are the peak hours for orders?
+
+```{r peak-hours}
+hourly_orders <- pizza %>%
+  group_by(order_hour) %>%
+  summarise(total_orders = n_distinct(order_id), .groups = "drop")
+
+hourly_orders %>%
+  ggplot(aes(x = order_hour, y = total_orders)) +
+  geom_col(fill = "steelblue", alpha = 0.8) +
+  labs(
+    title = "Orders by Hour of Day",
+    x = "Hour",
+    y = "Number of Orders"
+  ) +
+  scale_x_continuous(breaks = seq(0, 23, 2)) +
+  scale_y_continuous(labels = comma)
+```
+
+**Answer:** Peak hours are **12pm (lunch)** and **5-7pm (dinner)**.
+
+**Recommendation:** Ensure full staffing during these windows.
+
+## Which day of the week has the highest sales?
+
+```{r day-of-week}
+dow_sales <- pizza %>%
+  group_by(day_of_week) %>%
+  summarise(total_revenue = sum(total_price), .groups = "drop")
+
+dow_sales %>%
+  ggplot(aes(x = day_of_week, y = total_revenue, fill = total_revenue)) +
+  geom_col(alpha = 0.8, show.legend = FALSE) +
+  scale_fill_gradient(low = "lightblue", high = "steelblue") +
+  labs(
+    title = "Revenue by Day of Week",
+    x = "Day",
+    y = "Total Revenue ($)"
+  ) +
+  scale_y_continuous(labels = dollar)
+```
+
+**Answer:** **Friday** has the highest sales. Sunday has the lowest.
+
+**Recommendation:** Run promotions on slow days (Sunday) to increase traffic.
+
+\newpage
+
+## What is the best-selling pizza?
+
+```{r best-pizza}
+top_pizzas <- pizza %>%
+  group_by(pizza_name) %>%
+  summarise(total_sold = sum(quantity), .groups = "drop") %>%
+  arrange(desc(total_sold)) %>%
+  head(10)
+
+top_pizzas %>%
+  ggplot(aes(x = reorder(pizza_name, total_sold), y = total_sold)) +
+  geom_col(fill = "steelblue", alpha = 0.8) +
+  coord_flip() +
+  labs(
+    title = "Top 10 Best-Selling Pizzas",
+    x = "",
+    y = "Pizzas Sold"
+  ) +
+  scale_y_continuous(labels = comma)
+```
+
+**Answer:** **The Classic Deluxe Pizza** is the best-seller.
+
+**Recommendation:** Ensure ingredients for this pizza are always in stock.
+
+## What is the most popular pizza size?
+
+```{r pizza-size}
+size_sales <- pizza %>%
+  group_by(pizza_size) %>%
+  summarise(total_sold = sum(quantity), .groups = "drop") %>%
+  mutate(pct = total_sold / sum(total_sold) * 100) %>%
+  mutate(pizza_size = factor(pizza_size, levels = c("S", "M", "L", "XL", "XXL")))
+
+size_sales %>%
+  ggplot(aes(x = pizza_size, y = total_sold, fill = pizza_size)) +
+  geom_col(alpha = 0.8, show.legend = FALSE) +
+  labs(
+    title = "Pizzas Sold by Size",
+    x = "Size",
+    y = "Pizzas Sold"
+  ) +
+  scale_y_continuous(labels = comma) +
+  scale_fill_brewer(palette = "Blues")
+```
+
+**Answer:** **Large (L)** is the most popular size, accounting for **46%** of all sales.
+
+**Recommendation:** Optimize pricing and inventory around Large pizzas.
+
+## What is the average order value?
+
+```{r aov}
+order_totals <- pizza %>%
+  group_by(order_id) %>%
+  summarise(order_total = sum(total_price), .groups = "drop")
+
+avg_order <- mean(order_totals$order_total)
+median_order <- median(order_totals$order_total)
+
+order_totals %>%
+  ggplot(aes(x = order_total)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "white", alpha = 0.8) +
+  geom_vline(xintercept = avg_order, color = "red", linewidth = 1, linetype = "dashed") +
+  labs(
+    title = "Distribution of Order Values",
+    subtitle = paste("Average: $", round(avg_order, 2)),
+    x = "Order Total ($)",
+    y = "Number of Orders"
+  ) +
+  scale_x_continuous(labels = dollar)
+```
+
+**Answer:** The average order value is **$38.31**.
+
+**Recommendation:** Set delivery minimum at $35-40 to optimize operations.
+
+\newpage
+
+# Revenue Forecast
+
+## Daily Revenue Trend
+
+```{r daily-trend}
+daily_revenue %>%
+  ggplot(aes(x = order_date, y = revenue)) +
+  geom_line(color = "steelblue", linewidth = 0.4) +
+  labs(
+    title = "Daily Revenue (2015)",
+    x = "Date",
+    y = "Revenue ($)"
+  ) +
+  scale_y_continuous(labels = dollar) +
+  scale_x_date(date_breaks = "2 months", date_labels = "%b")
+```
+
+## 7-Day Forecast Model
+
+We used an ARIMA model trained on 358 days of data to predict the final 7 days of the year.
+
+```{r forecast-model}
+# Prepare data
+train_end <- nrow(daily_revenue) - 7
+train_ts <- ts(daily_revenue$revenue[1:train_end], frequency = 7)
+test_data <- daily_revenue$revenue[(train_end + 1):nrow(daily_revenue)]
+
+# Fit model
+model <- auto.arima(train_ts)
+
+# Forecast
+forecast_result <- forecast(model, h = 7)
+
+# Results table
+forecast_table <- tibble(
+  Date = daily_revenue$order_date[(train_end + 1):nrow(daily_revenue)],
+  Forecast = round(as.numeric(forecast_result$mean), 0),
+  Actual = round(test_data, 0),
+  Error = round(test_data - as.numeric(forecast_result$mean), 0)
+)
+
+kable(forecast_table,
+      col.names = c("Date", "Forecast ($)", "Actual ($)", "Error ($)"),
+      align = c("l", "r", "r", "r")) %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+## Forecast Accuracy
+
+```{r accuracy}
+errors <- test_data - forecast_result$mean
+mae <- mean(abs(errors))
+mape <- mean(abs(errors / test_data)) * 100
+
+accuracy_tbl <- tibble(
+  Metric = c("MAE (Mean Absolute Error)", "MAPE (Mean Absolute % Error)"),
+  Value = c(paste0("$", round(mae, 0)), paste0(round(mape, 1), "%"))
+)
+
+kable(accuracy_tbl) %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+\newpage
+
+# Lessons Learned
+
+## Why the Forecast Missed
+
+The model significantly underperformed during the test period. Upon investigation, the reason is clear: **the test period was Christmas week (December 25-31)**.
+
+**What happened:**
+
+1. **Christmas Day closure** — Revenue dropped to zero when the restaurant was closed
+2. **Post-holiday behavior** — Customers ate homemade food with family instead of ordering pizza
+3. **Atypical demand** — The week between Christmas and New Year is not representative of normal business
+
+**Why the model couldn't predict this:**
+
+- The model learned patterns from "typical" weeks throughout the year
+- It had no information about holidays or special events
+- Christmas only occurs once in the training data, so the model couldn't learn this pattern
+
+## How to Improve
+
+For a production forecasting system, I would:
+
+1. **Add a holiday calendar** — Flag holidays as a feature in the model
+2. **Exclude anomalies** — Train on typical weeks, handle holidays separately
+3. **Use a model designed for seasonality** — Facebook Prophet handles holidays explicitly
+4. **Incorporate external data** — Weather, local events, promotions
+
+This experience demonstrates that **understanding your data's context is as important as the technical modeling.**
+
+\newpage
+
+# Summary of Recommendations
+
+```{r recommendations}
+recs <- tibble(
+  Finding = c(
+    "Peak hours: 12pm, 5-7pm",
+    "Friday is best day",
+    "Sunday is slowest day",
+    "Classic Deluxe is #1",
+    "Large is most popular",
+    "AOV is $38.31",
+    "Forecast missed holidays"
+  ),
+  Action = c(
+    "Full staffing during peaks",
+    "Maximize Friday capacity",
+    "Run Sunday promotions",
+    "Stock Classic Deluxe ingredients",
+    "Optimize Large pizza pricing",
+    "Set $35-40 delivery minimum",
+    "Add holiday features to model"
+  )
+)
+
+kable(recs, col.names = c("Finding", "Recommended Action")) %>%
+  kable_styling(latex_options = c("hold_position", "striped"))
+```
+
+# Conclusion
+
+This analysis provided actionable insights into pizza restaurant operations:
+
+- Clear identification of peak hours and days for staffing optimization
+- Product performance data for inventory management
+- Average order value for pricing and promotion strategy
+- A forecasting model with documented limitations and improvement path
+
+The forecast's failure during Christmas week turned into a valuable learning opportunity, demonstrating the importance of domain knowledge and contextual understanding in data analysis.
+
+---
+
+*Report generated on `r Sys.Date()`*

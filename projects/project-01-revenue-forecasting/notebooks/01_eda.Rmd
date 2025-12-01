@@ -1,0 +1,381 @@
+---
+title: "Pizza Sales Analysis & Revenue Forecasting"
+author: "Jonathan Katz"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 10,
+  fig.height = 5
+)
+```
+
+# Introduction
+
+**Business Context:** A pizza restaurant wants to better understand their sales patterns and forecast future revenue to improve staffing, inventory, and operations.
+
+**Dataset:** 48,620 pizza orders from 2015 (full year)
+
+**Questions We're Answering:**
+
+1. What will total sales revenue be for the next 7 days?
+2. What are the peak hours for orders?
+3. Which day of the week has the highest sales?
+4. What is the best-selling pizza?
+5. What is the most popular pizza size?
+6. What is the average order value?
+
+---
+
+# Setup & Load Data
+
+```{r load-libraries}
+# Load libraries
+library(tidyverse)
+library(lubridate)
+library(scales)
+library(readxl)
+library(knitr)
+library(kableExtra)
+
+# Set theme for all plots
+theme_set(theme_minimal(base_size = 12))
+```
+
+```{r load-data}
+# Load data
+pizza <- read_excel("../data/raw/Data Model - Pizza Sales.xlsx")
+
+# Quick look at the data
+glimpse(pizza)
+```
+
+```{r clean-data}
+# Clean and prepare data
+pizza <- pizza %>%
+  mutate(
+    order_date = as.Date(order_date),
+    order_hour = hour(hms(order_time)),
+    day_of_week = wday(order_date, label = TRUE, week_start = 1),
+    month = month(order_date, label = TRUE)
+  )
+
+# Confirm data range
+cat("Date range:", as.character(min(pizza$order_date)), "to", as.character(max(pizza$order_date)), "\n")
+cat("Total orders:", format(n_distinct(pizza$order_id), big.mark = ","), "\n")
+cat("Total revenue: $", format(sum(pizza$total_price), big.mark = ","), "\n")
+```
+
+---
+
+# Question 1: What will total sales revenue be for the next 7 days?
+
+*This question will be answered in the forecasting notebook (02_forecasting.Rmd). Here we prepare the daily sales data.*
+
+```{r daily-sales-prep}
+# Aggregate daily sales for forecasting
+daily_sales <- pizza %>%
+  group_by(order_date) %>%
+  summarise(
+    total_revenue = sum(total_price),
+    total_orders = n_distinct(order_id),
+    total_pizzas = sum(quantity),
+    .groups = "drop"
+  )
+
+# Preview daily sales
+daily_sales %>%
+  head(10) %>%
+  kable(format.args = list(big.mark = ",")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+```{r daily-sales-trend}
+# Plot daily revenue trend
+daily_sales %>%
+  ggplot(aes(x = order_date, y = total_revenue)) +
+  geom_line(color = "steelblue", linewidth = 0.5) +
+  geom_smooth(method = "loess", color = "red", se = FALSE, linewidth = 1) +
+  labs(
+    title = "Daily Revenue Trend (2015)",
+    subtitle = "Blue = actual, Red = trend line",
+    x = "Date",
+    y = "Daily Revenue ($)"
+  ) +
+  scale_y_continuous(labels = dollar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b")
+```
+
+**Observation:** Revenue is relatively stable throughout the year with some weekly variation. No strong upward or downward trend.
+
+---
+
+# Question 2: What are the peak hours for orders?
+
+```{r peak-hours}
+# Orders by hour
+hourly_orders <- pizza %>%
+  group_by(order_hour) %>%
+  summarise(
+    total_orders = n_distinct(order_id),
+    total_revenue = sum(total_price),
+    .groups = "drop"
+  )
+
+# Plot
+hourly_orders %>%
+  ggplot(aes(x = order_hour, y = total_orders)) +
+  geom_col(fill = "steelblue", alpha = 0.8) +
+  geom_text(aes(label = comma(total_orders)), vjust = -0.5, size = 3) +
+  labs(
+    title = "What are the peak hours for orders?",
+    subtitle = "Total orders by hour of day (2015)",
+    x = "Hour of Day",
+    y = "Number of Orders"
+  ) +
+  scale_x_continuous(breaks = seq(0, 23, 1)) +
+  scale_y_continuous(labels = comma, expand = expansion(mult = c(0, 0.1)))
+```
+
+```{r peak-hours-summary}
+# Top 3 peak hours
+top_hours <- hourly_orders %>%
+  arrange(desc(total_orders)) %>%
+  head(3)
+
+cat("Peak Hours:\n")
+cat("1st:", top_hours$order_hour[1], ":00 -", comma(top_hours$total_orders[1]), "orders\n")
+cat("2nd:", top_hours$order_hour[2], ":00 -", comma(top_hours$total_orders[2]), "orders\n")
+cat("3rd:", top_hours$order_hour[3], ":00 -", comma(top_hours$total_orders[3]), "orders\n")
+```
+
+**Answer:** Peak hours are **12pm (lunch)** and **5-7pm (dinner)**. The restaurant should ensure full staffing during these windows.
+
+---
+
+# Question 3: Which day of the week has the highest sales?
+
+```{r day-of-week}
+# Sales by day of week
+dow_sales <- pizza %>%
+  group_by(day_of_week) %>%
+  summarise(
+    total_revenue = sum(total_price),
+    total_orders = n_distinct(order_id),
+    avg_daily_revenue = total_revenue / 52,  # 52 weeks in a year
+    .groups = "drop"
+  )
+
+# Plot
+dow_sales %>%
+  ggplot(aes(x = day_of_week, y = total_revenue, fill = total_revenue)) +
+  geom_col(alpha = 0.8, show.legend = FALSE) +
+  geom_text(aes(label = dollar(total_revenue, accuracy = 1)), vjust = -0.5, size = 3.5) +
+  scale_fill_gradient(low = "lightblue", high = "steelblue") +
+  labs(
+    title = "Which day of the week has the highest sales?",
+    subtitle = "Total revenue by day of week (2015)",
+    x = "Day of Week",
+    y = "Total Revenue ($)"
+  ) +
+  scale_y_continuous(labels = dollar, expand = expansion(mult = c(0, 0.1)))
+```
+
+```{r dow-summary}
+# Best and worst days
+best_day <- dow_sales %>% filter(total_revenue == max(total_revenue))
+worst_day <- dow_sales %>% filter(total_revenue == min(total_revenue))
+
+cat("Best day:", as.character(best_day$day_of_week), "- $", comma(best_day$total_revenue), "\n")
+cat("Worst day:", as.character(worst_day$day_of_week), "- $", comma(worst_day$total_revenue), "\n")
+cat("Difference:", dollar((best_day$total_revenue - worst_day$total_revenue) / worst_day$total_revenue * 100, accuracy = 0.1, prefix = ""), "% more revenue on", as.character(best_day$day_of_week))
+```
+
+**Answer:** **Friday** has the highest sales, followed by Thursday and Saturday. Sunday has the lowest sales — consider reduced hours or staffing.
+
+---
+
+# Question 4: What is the best-selling pizza?
+
+```{r best-selling-pizza}
+# Top 10 pizzas by quantity sold
+top_pizzas <- pizza %>%
+  group_by(pizza_name) %>%
+  summarise(
+    total_sold = sum(quantity),
+    total_revenue = sum(total_price),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(total_sold)) %>%
+  head(10)
+
+# Plot
+top_pizzas %>%
+  ggplot(aes(x = reorder(pizza_name, total_sold), y = total_sold)) +
+  geom_col(fill = "steelblue", alpha = 0.8) +
+  geom_text(aes(label = comma(total_sold)), hjust = -0.1, size = 3.5) +
+  coord_flip() +
+  labs(
+    title = "What is the best-selling pizza?",
+    subtitle = "Top 10 pizzas by quantity sold (2015)",
+    x = "",
+    y = "Total Pizzas Sold"
+  ) +
+  scale_y_continuous(labels = comma, expand = expansion(mult = c(0, 0.15)))
+```
+
+```{r best-pizza-summary}
+cat("Best-selling pizza:", top_pizzas$pizza_name[1], "\n")
+cat("Total sold:", comma(top_pizzas$total_sold[1]), "pizzas\n")
+cat("Total revenue: $", comma(top_pizzas$total_revenue[1]), "\n")
+```
+
+**Answer:** **The Classic Deluxe Pizza** is the best-seller with over 2,400 pizzas sold, generating significant revenue.
+
+---
+
+# Question 5: What is the most popular pizza size?
+
+```{r pizza-size}
+# Sales by size
+size_sales <- pizza %>%
+  group_by(pizza_size) %>%
+  summarise(
+    total_sold = sum(quantity),
+    total_revenue = sum(total_price),
+    pct_of_sales = total_sold / sum(pizza$quantity) * 100,
+    .groups = "drop"
+  ) %>%
+  arrange(desc(total_sold))
+
+# Reorder size factor
+size_order <- c("S", "M", "L", "XL", "XXL")
+size_sales <- size_sales %>%
+  mutate(pizza_size = factor(pizza_size, levels = size_order))
+
+# Plot
+size_sales %>%
+  ggplot(aes(x = pizza_size, y = total_sold, fill = pizza_size)) +
+  geom_col(alpha = 0.8, show.legend = FALSE) +
+  geom_text(aes(label = paste0(comma(total_sold), "\n(", round(pct_of_sales, 1), "%)")),
+            vjust = -0.3, size = 3.5) +
+  labs(
+    title = "What is the most popular pizza size?",
+    subtitle = "Total pizzas sold by size (2015)",
+    x = "Pizza Size",
+    y = "Total Pizzas Sold"
+  ) +
+  scale_y_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
+  scale_fill_brewer(palette = "Blues")
+```
+
+```{r size-summary}
+top_size <- size_sales %>% filter(total_sold == max(total_sold))
+cat("Most popular size:", top_size$pizza_size, "\n")
+cat("Percentage of all sales:", round(top_size$pct_of_sales, 1), "%\n")
+```
+
+**Answer:** **Large (L)** is the most popular size, accounting for nearly half of all pizzas sold. Consider optimizing inventory and pricing around this size.
+
+---
+
+# Question 6: What is the average order value?
+
+```{r avg-order-value}
+# Calculate order-level metrics
+order_summary <- pizza %>%
+  group_by(order_id, order_date) %>%
+  summarise(
+    order_total = sum(total_price),
+    pizzas_per_order = sum(quantity),
+    .groups = "drop"
+  )
+
+# Summary statistics
+avg_order_value <- mean(order_summary$order_total)
+median_order_value <- median(order_summary$order_total)
+avg_pizzas <- mean(order_summary$pizzas_per_order)
+
+cat("Average Order Value: $", round(avg_order_value, 2), "\n")
+cat("Median Order Value: $", round(median_order_value, 2), "\n")
+cat("Average Pizzas per Order:", round(avg_pizzas, 2), "\n")
+```
+
+```{r aov-distribution}
+# Distribution of order values
+order_summary %>%
+  ggplot(aes(x = order_total)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "white", alpha = 0.8) +
+  geom_vline(xintercept = avg_order_value, color = "red", linewidth = 1, linetype = "dashed") +
+  annotate("text", x = avg_order_value + 10, y = 2000,
+           label = paste("Avg: $", round(avg_order_value, 2)), color = "red") +
+  labs(
+    title = "What is the average order value?",
+    subtitle = "Distribution of order totals (2015)",
+    x = "Order Total ($)",
+    y = "Number of Orders"
+  ) +
+  scale_x_continuous(labels = dollar) +
+  scale_y_continuous(labels = comma)
+```
+
+**Answer:** The average order value is **$38.31**. Most orders fall between $15-$50. This metric is useful for setting promotions (e.g., "Free delivery on orders over $40").
+
+---
+
+# Summary of Findings
+
+```{r summary-table}
+# Create summary table
+findings <- tibble(
+  Question = c(
+    "Peak hours?",
+    "Best day of week?",
+    "Best-selling pizza?",
+    "Most popular size?",
+    "Average order value?"
+  ),
+  Answer = c(
+    "12pm (lunch), 5-7pm (dinner)",
+    "Friday",
+    "The Classic Deluxe Pizza",
+    "Large (L) - 46% of sales",
+    "$38.31"
+  ),
+  Business_Action = c(
+    "Full staffing during peak hours",
+    "Run promotions on slow days (Sunday)",
+    "Ensure Classic Deluxe ingredients always stocked",
+    "Optimize Large pizza pricing and inventory",
+    "Set delivery minimum at $35-40"
+  )
+)
+
+findings %>%
+  kable(col.names = c("Question", "Answer", "Recommended Action")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered"))
+```
+
+---
+
+# Next Steps
+
+The next notebook (**02_forecasting.Rmd**) will answer:
+
+> **"What will total sales revenue be for the next 7 days?"**
+
+We'll build a time series forecast using the `daily_sales` data prepared above.
+
+---
+
+*Analysis completed on `r Sys.Date()`*
