@@ -26,7 +26,7 @@ Develop a professional portfolio demonstrating expertise in:
 
 | # | Project | Status | Description |
 |---|---------|--------|-------------|
-| 1 | [Revenue Forecasting](./projects/project-01-revenue-forecasting/) | Not Started | Time series forecasting using retail sales data |
+| 1 | [Pizza Sales Revenue Forecasting](./projects/project-01-revenue-forecasting/) | **Complete** | Time series forecasting using R (ARIMA) |
 | 2 | [AP/Invoice Automation](./projects/project-02-ap-automation/) | Not Started | OCR + validation + anomaly detection pipeline |
 | 3 | [Executive Dashboard](./projects/project-03-executive-dashboard/) | Not Started | CFO-ready Tableau/Power BI dashboard |
 | 4 | [Financial Modeling](./projects/project-04-financial-modeling/) | Not Started | Multi-scenario 3-5 year projection model |
@@ -66,20 +66,21 @@ project-XX-name/
 
 ## Execution Plan
 
-### Phase 1: Setup (Current)
+### Phase 1: Setup
 - [x] Create folder structure
 - [x] Initialize GitHub repository
-- [ ] Document dependencies
-- [ ] Set up Python/R environments
+- [x] Document dependencies
+- [x] Set up Python/R environments
 
-### Phase 2: Project 1 — Revenue Forecasting
-- [ ] Download Kaggle retail sales dataset
-- [ ] Exploratory data analysis
-- [ ] Build forecasting models (ARIMA, Prophet)
-- [ ] Compare model accuracy
-- [ ] Create visualizations
-- [ ] Write project README
-- [ ] Generate report/case study
+### Phase 2: Project 1 — Pizza Sales Revenue Forecasting
+- [x] Download Kaggle pizza sales dataset
+- [x] Exploratory data analysis (6 business questions)
+- [x] Build forecasting model (ARIMA)
+- [x] Evaluate model accuracy
+- [x] Create visualizations
+- [x] Write project README
+- [x] Generate final report (HTML + PDF)
+- [x] Document lessons learned (Christmas seasonality)
 
 ### Phase 3: Project 2 — AP Automation
 - [ ] Obtain invoice dataset
@@ -141,15 +142,18 @@ python-dotenv>=1.0.0
 ### R (for forecasting)
 ```
 tidyverse
+lubridate
 forecast
-tsibble
-fable
-ggplot2
+readxl
+scales
+knitr
+kableExtra
 ```
 
 ### Tools
 - Python 3.11+
 - R 4.3+
+- RStudio
 - VS Code / Cursor
 - Tableau Public or Power BI
 - Figma (design)
@@ -186,8 +190,8 @@ ggplot2
 
 | Date | Milestone | Notes |
 |------|-----------|-------|
-| TBD | Repository created | Initial setup |
-| TBD | Project 1 complete | Revenue forecasting |
+| Nov 2024 | Repository created | Initial setup |
+| Nov 2024 | Project 1 complete | Pizza sales forecasting with R |
 | TBD | Project 2 complete | AP automation |
 | TBD | Project 3 complete | Dashboard |
 | TBD | Project 4 complete | Financial model |
@@ -199,12 +203,13 @@ ggplot2
 ## Resources
 
 ### Datasets
-- [Kaggle Store Sales Forecasting](https://www.kaggle.com/competitions/store-sales-time-series-forecasting)
+- [Kaggle Pizza Sales](https://www.kaggle.com/datasets/shilongzhuang/pizza-sales) — Project 1
 - [Superstore Dataset](https://www.kaggle.com/datasets/vivek468/superstore-dataset-final)
 - [Synthetic Invoice Data](https://www.kaggle.com/datasets) (TBD)
 
 ### Learning
-- [Prophet Documentation](https://facebook.github.io/prophet/)
+- [R for Data Science](https://r4ds.had.co.nz/)
+- [Forecast Package Documentation](https://pkg.robjhyndman.com/forecast/)
 - [Streamlit Documentation](https://docs.streamlit.io/)
 - [Tableau Public](https://public.tableau.com/)
 
