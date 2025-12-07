@@ -1,0 +1,70 @@
+Why Python First, Excel Second: AP Anomaly Detection Approach
+=============================================================
+
+This project processes 50,000 AP invoice records to detect anomalies.
+Here's why Python handles the business logic before handing off to Excel.
+
+
+PERFORMANCE
+-----------
+- Excel slows down significantly with large datasets (50K+ rows)
+- Complex formulas (nested IFs, VLOOKUPs, array formulas) compound the lag
+- Python processes 50,000 records in seconds with no performance degradation
+- Detection algorithms like "find invoices within 7 days with matching amounts"
+  would be impractical to build and run in Excel formulas
+
+
+RELIABILITY & ACCURACY
+----------------------
+- Excel formulas are fragile: one deleted row, shifted column, or wrong edit
+  breaks the entire formula chain
+- Silent failures are common - Excel won't always alert you when something
+  breaks, it just returns wrong numbers
+- Python logic is deterministic: same input always produces same output
+- Changes to source data? Re-run the script and get fresh, accurate results
+
+
+MAINTAINABILITY
+---------------
+- Business logic lives in one place (the .py file), not scattered across
+  dozens of cells
+- Code is readable and self-documenting - you can see exactly how "duplicate"
+  or "outlier" is defined
+- Updating detection rules means changing one file, not hunting through
+  spreadsheet formulas
+- Version control works properly with code files (unlike "Final_v2_REAL_final.xlsx")
+
+
+AUDITABILITY
+------------
+- Detection thresholds are explicitly defined in configuration
+- Each rule is a separate, testable function
+- Easy to explain to auditors exactly what logic was applied
+- Reproducible results for compliance requirements
+
+
+THE HYBRID APPROACH
+-------------------
+Python handles:
+  - Data loading and validation
+  - Complex detection algorithms (duplicates, statistical outliers, patterns)
+  - Risk scoring and categorization
+  - Generating clean output files
+
+Excel handles:
+  - Filtering and sorting flagged records
+  - Ad-hoc analysis and review
+  - Sharing results with stakeholders
+  - Pivot tables for summarization
+
+This gives you the computational power of Python with the familiar,
+accessible interface of Excel for the review workflow.
+
+
+RESULTS
+-------
+- 50,000 records analyzed
+- 11,111 anomalies detected (22.2%)
+- 11 HIGH risk items for immediate review
+- 494 MEDIUM risk items for 48-hour review
+- Processing time: seconds (vs. minutes/hours in Excel)
