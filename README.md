@@ -27,9 +27,9 @@ Develop a professional portfolio demonstrating expertise in:
 | # | Project | Status | Description |
 |---|---------|--------|-------------|
 | 1 | [Pizza Sales Revenue Forecasting](./projects/project-01-revenue-forecasting/) | **Complete** | Time series forecasting using R (ARIMA) |
-| 2 | [Invoice Anomaly Detection](./projects/project-02-ap-automation/) | Not Started | Excel Power Query + VBA tool to flag suspicious AP transactions |
-| 3 | [Executive Dashboard](./projects/project-03-executive-dashboard/) | Not Started | CFO-ready Tableau/Power BI dashboard |
-| 4 | [Financial Modeling](./projects/project-04-financial-modeling/) | Not Started | Multi-scenario 3-5 year projection model |
+| 2 | [Invoice Anomaly Detection](./projects/project-02-ap-automation/) | **Complete** | Python anomaly detector for AP transactions (duplicates, outliers, weekend/holiday flags) |
+| 3 | [Executive Dashboard](./projects/project-03-executive-dashboard/) | **Complete** | Tableau dashboard with KPIs, revenue trends, profitability analysis |
+| 4 | [Financial Modeling](./projects/project-04-financial-modeling/) | **Complete** | Python 3-statement model with Base/Upside/Downside scenarios |
 | 5 | [Finance Copilot App](./projects/project-05-finance-copilot-app/) | Not Started | Streamlit app: upload → clean → analyze → visualize |
 
 ---
@@ -83,31 +83,39 @@ project-XX-name/
 - [x] Document lessons learned (Christmas seasonality)
 
 ### Phase 3: Project 2 — Invoice Anomaly Detection
-- [ ] Find AP/invoice transaction dataset on Kaggle
-- [ ] Build Power Query data cleaning pipeline
-- [ ] Create anomaly detection rules:
-  - Duplicate invoices (same vendor + amount + date)
-  - Unusual amounts (outliers vs. vendor history)
+- [x] Find AP/invoice transaction dataset (50K records)
+- [x] Build Python anomaly detection script
+- [x] Create anomaly detection rules:
+  - Duplicate invoices (same vendor + amount within 7 days)
+  - Statistical outliers (>3 std dev from vendor mean)
   - Round number amounts (fraud indicator)
   - Weekend/holiday invoice dates
-  - New/inactive vendor activity
-- [ ] Write VBA script to automate checks
-- [ ] Create summary dashboard in Excel
-- [ ] Document methodology and business logic
+  - New vendor spikes (first invoice > $5K)
+  - Inactive vendor reactivation (>180 days gap)
+- [x] Generate HTML report and CSV outputs
+- [x] Document methodology (python_vs_excel_summary.txt)
 
 ### Phase 4: Project 3 — Executive Dashboard
-- [ ] Select dataset (Superstore or similar)
-- [ ] Design KPI framework
-- [ ] Build Tableau/Power BI dashboard
-- [ ] Publish to Tableau Public
-- [ ] Create screenshots for portfolio
+- [x] Download Superstore dataset from Kaggle
+- [x] Prep data with Python (calculated fields, margins)
+- [x] Build Tableau dashboard:
+  - KPI tiles (Revenue, Profit, Margin)
+  - Revenue trend over time
+  - Profit by category
+  - Sales vs Profit scatter plot
+- [x] Create step-by-step build guide
 
 ### Phase 5: Project 4 — Financial Modeling
-- [ ] Build Excel + Python hybrid model
-- [ ] Implement scenario analysis
-- [ ] Create 3-5 year projections
-- [ ] Document assumptions
-- [ ] Generate report
+- [x] Create historical restaurant financials (24 months)
+- [x] Build Python 3-statement model:
+  - Income Statement
+  - Balance Sheet
+  - Cash Flow Statement
+- [x] Implement 3 scenarios (Base/Upside/Downside)
+- [x] Create 5-year projections (2024-2028)
+- [x] Document assumptions (assumptions.md)
+- [x] Generate formatted Excel workbook with Executive Summary
+- [x] Add sensitivity analysis
 
 ### Phase 6: Project 5 — Finance Copilot App
 - [ ] Design app architecture
@@ -197,9 +205,9 @@ kableExtra
 |------|-----------|-------|
 | Nov 2024 | Repository created | Initial setup |
 | Nov 2024 | Project 1 complete | Pizza sales forecasting with R |
-| TBD | Project 2 complete | AP automation |
-| TBD | Project 3 complete | Dashboard |
-| TBD | Project 4 complete | Financial model |
+| Dec 2024 | Project 2 complete | Python AP anomaly detector (50K records, 7 detection rules) |
+| Dec 2024 | Project 3 complete | Tableau executive dashboard (KPIs, trends, scatter) |
+| Dec 2024 | Project 4 complete | Python 3-statement financial model with scenarios |
 | TBD | Project 5 complete | Finance Copilot |
 | TBD | Website live | Portfolio deployed |
 
@@ -226,4 +234,4 @@ This portfolio is for educational and professional demonstration purposes.
 
 ---
 
-*Last updated: November 2024*
+*Last updated: December 2024*
