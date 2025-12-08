@@ -1,8 +1,12 @@
-# Project 5: Finance Copilot Web App
+# Project 5: D.A.T.A.
 
-> Streamlit application that automates financial data analysis: upload, clean, categorize, analyze, visualize.
+> **D**ashboard & **A**nalytics **T**ool for **A**ccounting
 
-**Status:** Not Started
+Streamlit application that automates financial data analysis: upload, clean, analyze, visualize, export.
+
+**Status:** Complete
+
+**Live Demo:** https://finance-copilot-production-38c7.up.railway.app (Password: `demo2024`)
 
 ---
 
@@ -14,157 +18,164 @@ Financial analysts spend 60-80% of their time on:
 - Repetitive calculations
 - Creating the same charts repeatedly
 
-**Goal:** Build a "Finance Copilot" that automates routine analysis tasks, letting analysts focus on insights and decisions.
+**Goal:** Build D.A.T.A. to automate routine analysis tasks, letting analysts focus on insights and decisions.
 
 ---
 
-## App Features
+## Features
 
 ### 1. Data Upload
 - CSV/Excel file upload
-- Automatic column detection
-- Data type inference
-- Preview of uploaded data
+- Automatic column type detection (date, amount, category, entity)
+- Smart data preview
 
-### 2. Data Cleaning
-- Missing value handling
-- Duplicate detection
-- Outlier flagging
-- Date parsing
-- Currency normalization
+### 2. Auto-Detection & Cleaning
+- Identifies column types by name patterns and data analysis
+- Parses dates and extracts Year/Month components
+- Cleans currency formatting ($, commas, parentheses for negatives)
+- Handles missing values
 
-### 3. Transaction Categorization
-- Auto-categorize transactions
-- GL code mapping
-- Custom category rules
-- Manual override capability
+### 3. KPI Dashboard
+- Total amounts (positive/negative breakdown)
+- Transaction count
+- Average, median, min, max values
+- Real-time calculations
 
-### 4. Financial Analysis
-- Revenue/expense summary
-- Period-over-period comparison
-- Variance analysis
-- KPI calculations
-- Trend analysis
+### 4. Interactive Visualizations
+- **Trend Analysis**: Monthly line charts with area fills
+- **Category Breakdown**: Pie charts and horizontal bar charts
+- **Top Entities**: Ranked bar charts for vendors/customers
+- **Monthly Comparison**: Year-over-year comparison when multiple years present
 
-### 5. Visualization
-- Revenue trends
-- Expense breakdown (pie/bar)
-- Variance waterfall
-- KPI dashboard
-- Custom chart builder
+### 5. Export Options
+- Processed data (CSV)
+- Summary report (CSV)
+- Excel workbook with multiple sheets
 
-### 6. Export
-- Cleaned data (CSV/Excel)
-- Analysis report (PDF)
-- Charts (PNG/SVG)
+### 6. Security
+- Password protection via environment variable
+- Configurable for production deployment
 
 ---
 
-## Tools & Skills Demonstrated
+## Tech Stack
 
-### Technical
-- Python (pandas, numpy)
-- Streamlit (web framework)
-- Plotly (interactive charts)
-- scikit-learn (categorization)
-- Railway (deployment)
-
-### Financial Concepts
-- Transaction categorization
-- Chart of accounts
-- Financial reporting
-- Variance analysis
-- KPI frameworks
+| Component | Technology |
+|-----------|------------|
+| Framework | Streamlit |
+| Charts | Plotly |
+| Data Processing | Pandas, NumPy |
+| Excel Export | openpyxl |
+| Deployment | Railway |
+| Styling | Custom CSS |
 
 ---
 
-## App Architecture
+## Design System
+
+### Colors
+- **Primary**: Navy #1E3A5F
+- **Accent**: Teal #2DD4BF
+- **Success**: Green #10B981
+- **Warning**: Amber #F59E0B
+- **Error**: Red #EF4444
+
+### Typography
+- **Headlines**: Inter (600-700 weight)
+- **Body**: Inter (400-500 weight)
+- **Numbers**: JetBrains Mono
+
+---
+
+## Project Structure
 
 ```
-app/
-├── streamlit_app.py      # Main application
-├── pages/
-│   ├── 1_upload.py       # Data upload page
-│   ├── 2_clean.py        # Data cleaning page
-│   ├── 3_categorize.py   # Categorization page
-│   ├── 4_analyze.py      # Analysis page
-│   └── 5_visualize.py    # Visualization page
-├── utils/
-│   ├── data_cleaning.py  # Cleaning functions
-│   ├── categorizer.py    # Categorization logic
-│   ├── analyzer.py       # Analysis functions
-│   └── visualizer.py     # Chart functions
-└── config/
-    └── categories.yaml   # Category definitions
+project-05-data-app/
+├── app/
+│   ├── streamlit_app.py    # Main application (350+ lines)
+│   ├── styles.py           # Custom CSS and Plotly config
+│   └── utils.py            # Data processing utilities
+├── requirements.txt        # Python dependencies
+├── Procfile               # Railway start command
+├── railway.json           # Railway configuration
+├── .gitignore
+└── README.md
 ```
 
 ---
 
-## Development Phases
+## Quick Start
 
-### Phase 1: Core Upload & Cleaning
-- [ ] File upload interface
-- [ ] Data preview
-- [ ] Basic cleaning functions
-- [ ] Export cleaned data
+### Local Development
 
-### Phase 2: Categorization
-- [ ] Rule-based categorization
-- [ ] Category management UI
-- [ ] Manual override
-- [ ] Save category mappings
+```bash
+cd projects/project-05-data-app
+pip install -r requirements.txt
+streamlit run app/streamlit_app.py
+```
 
-### Phase 3: Analysis Engine
-- [ ] Summary statistics
-- [ ] Period comparison
-- [ ] Variance calculations
-- [ ] KPI computations
+Default password: `demo2024`
 
-### Phase 4: Visualization
-- [ ] Interactive charts
-- [ ] Dashboard layout
-- [ ] Chart customization
-- [ ] Export functionality
+### Railway Deployment
 
-### Phase 5: Deployment
-- [ ] Railway configuration
-- [ ] Environment variables
-- [ ] Domain setup
-- [ ] Performance optimization
+1. Connect GitHub repo to Railway
+2. Set environment variable: `APP_PASSWORD=your_secure_password`
+3. Railway auto-deploys using Procfile
 
 ---
 
-## Deliverables
+## Supported Data
 
-- [ ] `app/streamlit_app.py` — Main application
-- [ ] `src/` — Core processing modules
-- [ ] `deployment/railway.json` — Railway config
-- [ ] `requirements.txt` — Dependencies
-- [ ] `reports/app_documentation.pdf` — User guide
-- [ ] Live app URL — Deployed application
+| Type | Examples |
+|------|----------|
+| File Formats | CSV, Excel (.xlsx, .xls) |
+| Transaction Data | AP invoices, AR receipts, bank statements |
+| Budget Data | Department budgets, cost center reports |
+| Sales Data | Revenue by category, product sales |
 
 ---
 
-## Business Interpretation
+## Key Functions
 
-*To be completed after development*
+### `detect_column_types(df)`
+Auto-detects columns by:
+- Name pattern matching (date, amount, category keywords)
+- Data type analysis (numeric vs object)
+- Cardinality analysis for category vs entity distinction
 
-- Time savings demonstrated
-- Use cases supported
-- User feedback
-- Future roadmap
+### `clean_data(df, date_col, amount_col)`
+- Parses dates and extracts time components
+- Removes currency symbols and handles parentheses notation
+- Adds derived columns: Year, Month, Month_Name, Year_Month
+
+### `calculate_kpis(df, amount_col)`
+Computes: total, positive sum, negative sum, average, median, min, max, count, std dev
+
+### Chart Functions
+- `create_trend_chart()` - Monthly trend with area fill
+- `create_category_chart()` - Pie or horizontal bar
+- `create_entity_chart()` - Top N ranking
+- `create_monthly_comparison_chart()` - Year-over-year bars
+
+---
+
+## Business Value
+
+1. **Time Savings**: Eliminates repetitive data prep and chart creation
+2. **Consistency**: Same analysis framework applied to any dataset
+3. **Accessibility**: Non-technical users can perform complex analysis
+4. **Portability**: Works with any financial CSV/Excel data
 
 ---
 
 ## Future Enhancements
 
-- AI-powered categorization (LLM)
-- Natural language queries
-- Automated insights generation
-- Multi-user support
-- Database integration
-- API endpoints
-- Scheduled reports
+- [ ] AI-powered categorization (LLM integration)
+- [ ] Natural language queries
+- [ ] PDF report generation
+- [ ] Multi-user authentication
+- [ ] Database integration
+- [ ] API endpoints for automation
 
 ---
 
