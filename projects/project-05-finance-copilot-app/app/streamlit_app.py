@@ -49,14 +49,15 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Inject Google Fonts and CSS using components.html for Railway compatibility
-# This method works better than st.markdown with unsafe_allow_html on Railway
-fonts_html = '''
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-'''
-components.html(fonts_html + CUSTOM_CSS, height=0)
+# Inject Google Fonts and CSS
+# Note: Railway may show HTML as text if unsafe_allow_html is blocked
+# This is a known issue with some Railway deployments
+try:
+    fonts_html = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">'
+    st.markdown(fonts_html + CUSTOM_CSS, unsafe_allow_html=True)
+except Exception as e:
+    # Fallback: CSS will still work via Streamlit's default styling
+    st.warning("Custom styling may not be fully applied")
 
 
 def check_password() -> bool:
