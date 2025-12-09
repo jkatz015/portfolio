@@ -49,17 +49,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Inject Google Fonts and CSS using st.html() for better Railway compatibility
-fonts_html = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">'
-try:
-    # Use st.html() if available (Streamlit 1.28+), fallback to st.markdown
-    if hasattr(st, 'html'):
-        st.html(fonts_html + CUSTOM_CSS)
-    else:
-        st.markdown(fonts_html + CUSTOM_CSS, unsafe_allow_html=True)
-except Exception as e:
-    # Fallback: CSS will still work via Streamlit's default styling
-    st.markdown(fonts_html + CUSTOM_CSS, unsafe_allow_html=True)
+# CSS injection removed - Railway blocks unsafe_allow_html
+# Using Streamlit's native theming via config.toml instead
+# This ensures the app works on Railway without HTML rendering issues
 
 
 def check_password() -> bool:
@@ -184,7 +176,7 @@ def render_kpi_card(label: str, value: str, change: str = None, is_positive: boo
     delta_value = None
     if change:
         delta_value = f"{'↑' if is_positive else '↓'} {change}"
-    
+
     st.metric(
         label=label,
         value=value,
@@ -206,7 +198,7 @@ def render_kpis(kpis: dict):
     with col4:
         render_kpi_card("Transaction Count", f"{kpis['count']:,}")
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("")  # Spacing
 
     # Row 2: Stats (mono font)
     col1, col2, col3, col4 = st.columns(4)
@@ -425,7 +417,7 @@ def main():
         )
 
     with col_sample:
-        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("")  # Spacing
         if st.button("Load Sample Data", use_container_width=True):
             st.session_state.sample_data = generate_sample_data()
             st.session_state.using_sample = True
@@ -465,7 +457,8 @@ def main():
         # Column mapping
         columns = render_column_mapping(df, detected)
 
-        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("")  # Spacing
+        st.markdown("")  # Spacing
 
         # Action buttons row
         col_analyze, col_clear = st.columns([3, 1])
