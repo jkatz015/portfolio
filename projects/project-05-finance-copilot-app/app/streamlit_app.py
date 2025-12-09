@@ -48,7 +48,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Inject custom CSS
+# Inject Google Fonts via link tag (more reliable than @import for Railway)
+st.markdown('''
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+''', unsafe_allow_html=True)
+
+# Inject custom CSS - ensure it loads early for Railway compatibility
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
 

@@ -6,8 +6,7 @@ Professional design system - V0 inspired light theme
 
 CUSTOM_CSS = """
 <style>
-    /* Import Google Fonts - Geist-like clean sans */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    /* Google Fonts are loaded via <link> tag in streamlit_app.py for Railway compatibility */
 
     /* Root Variables - Light theme with teal accent */
     :root {
