@@ -78,7 +78,7 @@ def check_password() -> bool:
         st.markdown("### D.A.T.A.")
         st.markdown("*Dashboard & Analytics Tool for Accounting*")
         st.markdown("---")
-        
+
         # Password form
         st.markdown("**🔒 Password**")
         password = st.text_input("Password", type="password", key="password_input", label_visibility="collapsed", placeholder="Enter your password")
@@ -209,7 +209,7 @@ def render_kpis(kpis: dict):
     with col4:
         render_kpi_card("Transaction Count", f"{kpis['count']:,}")
 
-    st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # Row 2: Stats (mono font)
     col1, col2, col3, col4 = st.columns(4)
@@ -399,12 +399,8 @@ def generate_sample_data() -> pd.DataFrame:
 
 def render_footer():
     """Render the app footer."""
-    st.markdown('''
-    <div class="footer">
-        D.A.T.A. • Built with Streamlit • Part of
-        <a href="https://github.com/jkatz015" target="_blank">Financial Analytics Portfolio</a>
-    </div>
-    ''', unsafe_allow_html=True)
+    st.markdown("---")
+    st.caption("D.A.T.A. • Built with Streamlit • Part of [Financial Analytics Portfolio](https://github.com/jkatz015)")
 
 
 def main():
@@ -432,7 +428,7 @@ def main():
         )
 
     with col_sample:
-        st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
         if st.button("Load Sample Data", use_container_width=True):
             st.session_state.sample_data = generate_sample_data()
             st.session_state.using_sample = True
@@ -479,7 +475,7 @@ def main():
         # Column mapping
         columns = render_column_mapping(df, detected)
 
-        st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
         # Action buttons row
         col_analyze, col_clear = st.columns([3, 1])
@@ -539,20 +535,10 @@ def main():
             render_export_section(df_clean, columns)
 
     else:
-        # Show helpful info when no file uploaded
-        st.markdown('''
-        <div style="text-align: center; padding: 3rem 1rem; color: #78716c;">
-            <div style="width: 4rem; height: 4rem; border-radius: 0.75rem; background: rgba(13, 148, 136, 0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
-                    <path d="M3 5V19A9 3 0 0 0 21 19V5"/>
-                    <path d="M3 12A9 3 0 0 0 21 12"/>
-                </svg>
-            </div>
-            <p style="font-size: 1rem; margin-bottom: 0.5rem; color: #1c1917;">Drop a CSV or Excel file to get started</p>
-            <p style="font-size: 0.875rem;">Or click "Load Sample Data" to explore with demo transactions</p>
-        </div>
-        ''', unsafe_allow_html=True)
+        # Show helpful info when no file uploaded - use native Streamlit components
+        st.markdown("---")
+        st.info("📊 Drop a CSV or Excel file to get started")
+        st.caption("Or click 'Load Sample Data' to explore with demo transactions")
 
     # Footer
     render_footer()
