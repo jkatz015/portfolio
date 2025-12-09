@@ -178,21 +178,16 @@ def render_column_mapping(df: pd.DataFrame, detected: dict):
 
 
 def render_kpi_card(label: str, value: str, change: str = None, is_positive: bool = True, mono: bool = False):
-    """Render a single KPI card."""
-    value_class = "kpi-value-mono" if mono else ""
-    change_html = ""
+    """Render a single KPI card using Streamlit's native metric component."""
+    delta_value = None
     if change:
-        change_class = "kpi-change-positive" if is_positive else "kpi-change-negative"
-        icon = "↑" if is_positive else "↓"
-        change_html = f'<div class="kpi-change {change_class}">{icon} {change}</div>'
-
-    st.markdown(f'''
-    <div class="kpi-card">
-        <p class="kpi-label">{label}</p>
-        <p class="kpi-value {value_class}">{value}</p>
-        {change_html}
-    </div>
-    ''', unsafe_allow_html=True)
+        delta_value = f"{'↑' if is_positive else '↓'} {change}"
+    
+    st.metric(
+        label=label,
+        value=value,
+        delta=delta_value if change else None
+    )
 
 
 def render_kpis(kpis: dict):
@@ -458,16 +453,9 @@ def main():
             st.error("⚠️ The uploaded file is empty. Please upload a file with data.")
             return
 
-        # Status badge update
+        # Status badge update - use native Streamlit components
         badge_text = f"{len(df):,} rows loaded" if data_source == "uploaded" else "Sample Data Loaded"
-        st.markdown(f'''
-        <div style="margin: 1rem 0;">
-            <span class="status-badge">
-                <span class="status-dot"></span>
-                {badge_text}
-            </span>
-        </div>
-        ''', unsafe_allow_html=True)
+        st.success(f"✅ {badge_text}")
 
         # Auto-detect column types
         detected = detect_column_types(df)
