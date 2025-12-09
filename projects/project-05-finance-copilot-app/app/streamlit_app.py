@@ -4,6 +4,7 @@ Upload → Clean → Analyze → Visualize → Export
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
 import os
@@ -73,28 +74,13 @@ def check_password() -> bool:
     col1, col2, col3 = st.columns([1, 1.5, 1])
 
     with col2:
-        # Logo and title
-        st.markdown('''
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <div style="display: inline-flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                <div style="width: 3rem; height: 3rem; border-radius: 0.5rem; background: rgba(13, 148, 136, 0.1); display: flex; align-items: center; justify-content: center;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <ellipse cx="12" cy="5" rx="9" ry="3"/>
-                        <path d="M3 5V19A9 3 0 0 0 21 19V5"/>
-                        <path d="M3 12A9 3 0 0 0 21 12"/>
-                    </svg>
-                </div>
-                <div style="text-align: left;">
-                    <h1 style="margin: 0; font-size: 2rem; font-weight: 700; color: #1c1917; letter-spacing: -0.025em;">D.A.T.A.</h1>
-                    <p style="margin: 0; font-size: 0.875rem; color: #78716c;">Dashboard & Analytics Tool</p>
-                </div>
-            </div>
-            <p style="color: #78716c; font-size: 0.875rem;">for Accounting</p>
-        </div>
-        ''', unsafe_allow_html=True)
-
+        # Logo and title - use Streamlit native components for Railway compatibility
+        st.markdown("### D.A.T.A.")
+        st.markdown("*Dashboard & Analytics Tool for Accounting*")
+        st.markdown("---")
+        
         # Password form
-        st.markdown('<p style="font-size: 0.875rem; color: #1c1917; margin-bottom: 0.5rem;">🔒 Password</p>', unsafe_allow_html=True)
+        st.markdown("**🔒 Password**")
         password = st.text_input("Password", type="password", key="password_input", label_visibility="collapsed", placeholder="Enter your password")
 
         if st.button("Access Dashboard", use_container_width=True):
@@ -104,11 +90,7 @@ def check_password() -> bool:
             else:
                 st.error("Incorrect password. Please try again.")
 
-        st.markdown('''
-        <p style="text-align: center; color: #a8a29e; font-size: 0.75rem; margin-top: 1.5rem;">
-            Professional financial data analysis platform
-        </p>
-        ''', unsafe_allow_html=True)
+        st.caption("Professional financial data analysis platform")
 
     return False
 
@@ -118,31 +100,11 @@ def render_header():
     col1, col2 = st.columns([3, 1])
 
     with col1:
-        st.markdown('''
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.5rem; background: rgba(13, 148, 136, 0.1); display: flex; align-items: center; justify-content: center;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
-                    <path d="M3 5V19A9 3 0 0 0 21 19V5"/>
-                    <path d="M3 12A9 3 0 0 0 21 12"/>
-                </svg>
-            </div>
-            <div>
-                <h1 style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #1c1917; letter-spacing: -0.025em;">D.A.T.A.</h1>
-                <p style="margin: 0; font-size: 0.75rem; color: #78716c;">Upload • Clean • Analyze • Visualize • Export</p>
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
+        st.markdown("### D.A.T.A.")
+        st.caption("Upload • Clean • Analyze • Visualize • Export")
 
     with col2:
-        st.markdown('''
-        <div style="display: flex; justify-content: flex-end;">
-            <div class="status-badge">
-                <span class="status-dot"></span>
-                Ready to Analyze
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
+        st.info("✅ Ready to Analyze")
 
 
 def render_upload_section():
