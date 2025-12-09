@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -7792,28 +7791,28 @@ a.anchor-link {
 <pre>&lt;class 'pandas.core.frame.DataFrame'&gt;
 RangeIndex: 50150 entries, 0 to 50149
 Data columns (total 20 columns):
- #   Column           Non-Null Count  Dtype  
----  ------           --------------  -----  
- 0   INVOICE_ID       50150 non-null  int64  
- 1   VENDOR_ID        50150 non-null  int64  
- 2   VENDOR_NAME      50150 non-null  object 
- 3   VENDOR_NUMBER    50150 non-null  int64  
- 4   VENDOR_COUNTRY   50150 non-null  object 
- 5   VENDOR_REGION    50150 non-null  object 
- 6   INVOICE_DATE     50150 non-null  object 
- 7   DUE_DATE         50150 non-null  object 
+ #   Column           Non-Null Count  Dtype
+---  ------           --------------  -----
+ 0   INVOICE_ID       50150 non-null  int64
+ 1   VENDOR_ID        50150 non-null  int64
+ 2   VENDOR_NAME      50150 non-null  object
+ 3   VENDOR_NUMBER    50150 non-null  int64
+ 4   VENDOR_COUNTRY   50150 non-null  object
+ 5   VENDOR_REGION    50150 non-null  object
+ 6   INVOICE_DATE     50150 non-null  object
+ 7   DUE_DATE         50150 non-null  object
  8   INVOICE_AMOUNT   50150 non-null  float64
- 9   CURRENCY         50150 non-null  object 
- 10  GL_CODE          50150 non-null  object 
- 11  PO_TYPE          50150 non-null  object 
- 12  COMPANY_CODE     50150 non-null  int64  
- 13  BUSINESS_UNIT    50150 non-null  int64  
- 14  COST_CENTER      50150 non-null  object 
- 15  PAYMENT_STATUS   50150 non-null  object 
+ 9   CURRENCY         50150 non-null  object
+ 10  GL_CODE          50150 non-null  object
+ 11  PO_TYPE          50150 non-null  object
+ 12  COMPANY_CODE     50150 non-null  int64
+ 13  BUSINESS_UNIT    50150 non-null  int64
+ 14  COST_CENTER      50150 non-null  object
+ 15  PAYMENT_STATUS   50150 non-null  object
  16  APPROVAL_STATUS  50150 non-null  float64
  17  CREDIT_LIMIT     50150 non-null  float64
- 18  INVOICE_TIME     50150 non-null  int64  
- 19  _ANOMALY_TYPE    50150 non-null  object 
+ 18  INVOICE_TIME     50150 non-null  int64
+ 19  _ANOMALY_TYPE    50150 non-null  object
 dtypes: float64(3), int64(6), object(11)
 memory usage: 7.7+ MB
 </pre>
@@ -8256,10 +8255,10 @@ dtype: object
 <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">numeric_cols</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">continue</span>  <span class="c1"># skip constant columns</span>
-    
+
     <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">iqr_bounds</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">: lower=</span><span class="si">{</span><span class="n">lower</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, upper=</span><span class="si">{</span><span class="n">upper</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    
+
     <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">lower</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">lower</span>
     <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">upper</span>
 </pre></div>
@@ -8544,7 +8543,7 @@ Preview:
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span> 
+<div class="highlight hl-ipython3"><pre><span></span>
 </pre></div>
 </div>
 </div>
