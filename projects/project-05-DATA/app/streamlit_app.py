@@ -49,9 +49,15 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# CSS injection removed - Railway blocks unsafe_allow_html
-# Using Streamlit's native theming via config.toml instead
-# This ensures the app works on Railway without HTML rendering issues
+# Inject custom CSS for V0-inspired styling
+st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+
+# Load Google Fonts
+st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+""", unsafe_allow_html=True)
 
 
 def check_password() -> bool:
