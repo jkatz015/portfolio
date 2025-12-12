@@ -6,16 +6,17 @@ Professional design system - V0 inspired light theme
 
 CUSTOM_CSS = """
 <style>
-    /* Google Fonts are loaded via <link> tag in streamlit_app.py for Railway compatibility */
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-    /* Root Variables - Light theme with teal accent */
+    /* Root Variables - Light theme with teal accent (matching V0) */
     :root {
         --background: #f5f5f4;
         --background-card: #ffffff;
         --background-muted: #fafaf9;
-        --foreground: #1c1917;
-        --foreground-muted: #78716c;
-        --foreground-subtle: #a8a29e;
+        --foreground: #0f172a;
+        --foreground-muted: #64748b;
+        --foreground-subtle: #94a3b8;
         --primary: #0d9488;
         --primary-hover: #0f766e;
         --primary-light: #ccfbf1;
@@ -29,12 +30,26 @@ CUSTOM_CSS = """
         --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         --radius: 0.5rem;
+        --stone-50: #fafaf9;
+        --stone-100: #f5f5f4;
+        --stone-200: #e7e5e4;
+        --stone-300: #d6d3d1;
+        --slate-50: #f8fafc;
+        --slate-100: #f1f5f9;
+        --slate-500: #64748b;
+        --slate-700: #334155;
+        --slate-900: #0f172a;
+        --teal-50: #f0fdfa;
+        --teal-100: #ccfbf1;
+        --teal-500: #14b8a6;
+        --teal-600: #0d9488;
+        --teal-700: #0f766e;
     }
 
     /* Global Styles */
     .stApp {
-        background-color: var(--background) !important;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background-color: var(--stone-100) !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
     }
 
     /* Hide Streamlit branding */

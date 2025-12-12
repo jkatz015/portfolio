@@ -50,14 +50,18 @@ st.set_page_config(
 )
 
 # Inject custom CSS for V0-inspired styling
-st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+# Extract just the CSS content (without <style> tags) for st.html
+CSS_CONTENT = CUSTOM_CSS.replace("<style>", "").replace("</style>", "").strip()
 
-# Load Google Fonts
-st.markdown("""
+# Use st.html for more reliable CSS injection on Railway
+st.html(f"""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-""", unsafe_allow_html=True)
+<style>
+{CSS_CONTENT}
+</style>
+""")
 
 
 def check_password() -> bool:
@@ -70,27 +74,105 @@ def check_password() -> bool:
     if st.session_state.authenticated:
         return True
 
+    # Full page login with centered card (matching V0 design)
+    st.markdown("""
+    <style>
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+    }
+    .login-card {
+        background: rgba(240, 253, 250, 0.5);
+        border: 1px solid #e7e5e4;
+        border-radius: 0.75rem;
+        padding: 2.5rem;
+        max-width: 28rem;
+        width: 100%;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+    .login-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    .login-icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 0.5rem;
+        background-color: rgba(13, 148, 136, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .login-icon svg {
+        width: 1.5rem;
+        height: 1.5rem;
+        color: #0d9488;
+    }
+    .login-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #0f172a;
+        letter-spacing: -0.025em;
+        margin: 0;
+    }
+    .login-subtitle {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0;
+    }
+    .login-tagline {
+        text-align: center;
+        color: #64748b;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+    .login-footer {
+        text-align: center;
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 1.5rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     # Center the login card
-    col1, col2, col3 = st.columns([1, 1.5, 1])
+    col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        # Logo and title - use Streamlit native components for Railway compatibility
-        st.markdown("### D.A.T.A.")
-        st.markdown("*Dashboard & Analytics Tool for Accounting*")
-        st.markdown("---")
+        # Login card with V0 styling
+        st.markdown("""
+        <div class="login-header">
+            <div class="login-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                    <path d="M3 5V19A9 3 0 0 0 21 19V5"></path>
+                    <path d="M3 12A9 3 0 0 0 21 12"></path>
+                </svg>
+            </div>
+            <div>
+                <h1 class="login-title">D.A.T.A.</h1>
+                <p class="login-subtitle">Dashboard & Analytics Tool</p>
+            </div>
+        </div>
+        <p class="login-tagline">for Accounting</p>
+        """, unsafe_allow_html=True)
 
         # Password form
         st.markdown("**🔒 Password**")
         password = st.text_input("Password", type="password", key="password_input", label_visibility="collapsed", placeholder="Enter your password")
 
-        if st.button("Access Dashboard", use_container_width=True):
+        if st.button("Access Dashboard", use_container_width=True, type="primary"):
             if password == correct_password:
                 st.session_state.authenticated = True
                 st.rerun()
             else:
                 st.error("Incorrect password. Please try again.")
 
-        st.caption("Professional financial data analysis platform")
+        st.markdown('<p class="login-footer">Professional financial data analysis platform</p>', unsafe_allow_html=True)
 
     return False
 
