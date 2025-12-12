@@ -143,14 +143,14 @@ def check_password() -> bool:
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        # Login card with V0 styling
+        # Login card with V0 styling - Database cylinder icon (Lucide style)
         st.markdown("""
         <div class="login-header">
             <div class="login-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-                    <path d="M3 5V19A9 3 0 0 0 21 19V5"></path>
-                    <path d="M3 12A9 3 0 0 0 21 12"></path>
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
                 </svg>
             </div>
             <div>
@@ -178,15 +178,39 @@ def check_password() -> bool:
 
 
 def render_header():
-    """Render the app header."""
+    """Render the app header with database icon."""
     col1, col2 = st.columns([3, 1])
 
     with col1:
-        st.markdown("### D.A.T.A.")
-        st.caption("Upload • Clean • Analyze • Visualize • Export")
+        st.markdown("""
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.5rem; background-color: rgba(13, 148, 136, 0.1); display: flex; align-items: center; justify-content: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                </svg>
+            </div>
+            <div>
+                <h1 style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #0f172a; letter-spacing: -0.025em;">D.A.T.A.</h1>
+                <p style="margin: 0; font-size: 0.75rem; color: #64748b;">Upload • Clean • Analyze • Visualize • Export</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with col2:
-        st.info("✅ Ready to Analyze")
+        st.markdown("""
+        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.75rem; background-color: #f0fdfa; border: 1px solid #99f6e4; border-radius: 9999px; width: fit-content; float: right;">
+            <div style="width: 0.5rem; height: 0.5rem; border-radius: 50%; background-color: #14b8a6; animation: pulse 2s infinite;"></div>
+            <span style="font-size: 0.75rem; color: #0f766e; font-weight: 500;">Ready to Analyze</span>
+        </div>
+        <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        </style>
+        """, unsafe_allow_html=True)
 
 
 def render_upload_section():
