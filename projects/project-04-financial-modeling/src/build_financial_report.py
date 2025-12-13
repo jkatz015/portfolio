@@ -65,9 +65,9 @@ def main():
         }}
 
         body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #ffffff;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
             min-height: 100vh;
             padding: 20px;
         }}
@@ -80,24 +80,24 @@ def main():
         .header {{
             text-align: center;
             padding: 30px 0;
-            border-bottom: 2px solid #4a90a4;
+            border-bottom: 2px solid #4CAF50;
             margin-bottom: 30px;
         }}
 
         .header h1 {{
             font-size: 2.5em;
-            font-weight: 300;
+            font-weight: 400;
             margin-bottom: 10px;
-            color: #4fc3f7;
+            color: #333;
         }}
 
         .header .subtitle {{
-            color: #90caf9;
+            color: #666;
             font-size: 1.1em;
         }}
 
         .timestamp {{
-            color: #78909c;
+            color: #999;
             font-size: 0.9em;
             margin-top: 10px;
         }}
@@ -111,22 +111,23 @@ def main():
         }}
 
         .scenario-card {{
-            background: linear-gradient(145deg, #1e3a5f 0%, #1a2d47 100%);
-            border-radius: 12px;
+            background: white;
+            border-radius: 8px;
             padding: 25px;
-            border: 1px solid #2d4a6f;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #ddd;
         }}
 
         .scenario-card.base {{
-            border-color: #4fc3f7;
+            border-left-color: #4CAF50;
         }}
 
         .scenario-card.upside {{
-            border-color: #4caf50;
+            border-left-color: #2196F3;
         }}
 
         .scenario-card.downside {{
-            border-color: #f44336;
+            border-left-color: #f57c00;
         }}
 
         .scenario-title {{
@@ -134,28 +135,28 @@ def main():
             font-weight: 600;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #2d4a6f;
+            border-bottom: 1px solid #ddd;
         }}
 
-        .scenario-title.base {{ color: #4fc3f7; }}
-        .scenario-title.upside {{ color: #4caf50; }}
-        .scenario-title.downside {{ color: #f44336; }}
+        .scenario-title.base {{ color: #4CAF50; }}
+        .scenario-title.upside {{ color: #2196F3; }}
+        .scenario-title.downside {{ color: #f57c00; }}
 
         .metric-row {{
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid #eee;
         }}
 
         .metric-label {{
-            color: #90caf9;
+            color: #666;
             font-size: 0.9em;
         }}
 
         .metric-value {{
             font-weight: 600;
-            color: #ffffff;
+            color: #333;
         }}
 
         /* KPI Cards */
@@ -167,16 +168,16 @@ def main():
         }}
 
         .kpi-card {{
-            background: linear-gradient(145deg, #1e3a5f 0%, #1a2d47 100%);
-            border-radius: 12px;
+            background: white;
+            border-radius: 8px;
             padding: 20px;
             text-align: center;
-            border: 1px solid #2d4a6f;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }}
 
         .kpi-label {{
             font-size: 0.8em;
-            color: #90caf9;
+            color: #666;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 8px;
@@ -185,31 +186,31 @@ def main():
         .kpi-value {{
             font-size: 1.8em;
             font-weight: 600;
-            color: #ffffff;
+            color: #333;
         }}
 
         .kpi-subtext {{
             font-size: 0.8em;
-            color: #78909c;
+            color: #999;
             margin-top: 5px;
         }}
 
         /* Section styling */
         .section {{
-            background: linear-gradient(145deg, #1e3a5f 0%, #1a2d47 100%);
-            border-radius: 12px;
+            background: white;
+            border-radius: 8px;
             padding: 25px;
             margin-bottom: 25px;
-            border: 1px solid #2d4a6f;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }}
 
         .section h2 {{
             font-size: 1.3em;
             font-weight: 500;
-            color: #4fc3f7;
+            color: #333;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #2d4a6f;
+            border-bottom: 2px solid #4CAF50;
         }}
 
         /* Tables */
@@ -221,8 +222,8 @@ def main():
         th {{
             text-align: left;
             padding: 12px 15px;
-            background: #1a2d47;
-            color: #4fc3f7;
+            background: #4CAF50;
+            color: white;
             font-weight: 500;
             font-size: 0.85em;
             text-transform: uppercase;
@@ -231,12 +232,12 @@ def main():
 
         td {{
             padding: 12px 15px;
-            border-bottom: 1px solid #2d4a6f;
-            color: #e0e0e0;
+            border-bottom: 1px solid #ddd;
+            color: #333;
         }}
 
         tr:hover td {{
-            background: rgba(79, 195, 247, 0.1);
+            background: #f5f5f5;
         }}
 
         .text-right {{
@@ -244,11 +245,11 @@ def main():
         }}
 
         .positive {{
-            color: #4caf50;
+            color: #388e3c;
         }}
 
         .negative {{
-            color: #f44336;
+            color: #d32f2f;
         }}
 
         /* Two column layout */
@@ -266,29 +267,29 @@ def main():
         }}
 
         .assumption-item {{
-            background: #1a2d47;
+            background: #e8f5e9;
             padding: 15px;
             border-radius: 8px;
         }}
 
         .assumption-label {{
             font-size: 0.85em;
-            color: #78909c;
+            color: #666;
             margin-bottom: 5px;
         }}
 
         .assumption-value {{
             font-size: 1.1em;
-            color: #ffffff;
+            color: #333;
         }}
 
         /* Footer */
         .footer {{
             text-align: center;
             padding: 30px;
-            color: #78909c;
+            color: #999;
             font-size: 0.9em;
-            border-top: 1px solid #2d4a6f;
+            border-top: 1px solid #ddd;
             margin-top: 30px;
         }}
 

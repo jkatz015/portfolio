@@ -178,9 +178,9 @@ html = f"""
         }}
 
         body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #ffffff;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
             min-height: 100vh;
             padding: 20px;
         }}
@@ -193,24 +193,24 @@ html = f"""
         .header {{
             text-align: center;
             padding: 30px 0;
-            border-bottom: 2px solid #4a90a4;
+            border-bottom: 2px solid #4CAF50;
             margin-bottom: 30px;
         }}
 
         .header h1 {{
             font-size: 2.5em;
-            font-weight: 300;
+            font-weight: 400;
             margin-bottom: 10px;
-            color: #4fc3f7;
+            color: #333;
         }}
 
         .header .subtitle {{
-            color: #90caf9;
+            color: #666;
             font-size: 1.1em;
         }}
 
         .timestamp {{
-            color: #78909c;
+            color: #999;
             font-size: 0.9em;
             margin-top: 10px;
         }}
@@ -224,22 +224,22 @@ html = f"""
         }}
 
         .kpi-card {{
-            background: linear-gradient(145deg, #1e3a5f 0%, #1a2d47 100%);
-            border-radius: 12px;
+            background: white;
+            border-radius: 8px;
             padding: 25px;
             text-align: center;
-            border: 1px solid #2d4a6f;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: transform 0.2s, box-shadow 0.2s;
         }}
 
         .kpi-card:hover {{
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }}
 
         .kpi-label {{
             font-size: 0.85em;
-            color: #90caf9;
+            color: #666;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 10px;
@@ -248,45 +248,45 @@ html = f"""
         .kpi-value {{
             font-size: 2.2em;
             font-weight: 600;
-            color: #ffffff;
+            color: #333;
             margin-bottom: 8px;
         }}
 
         .kpi-subtext {{
             font-size: 0.85em;
-            color: #78909c;
+            color: #999;
         }}
 
         .trend-up {{
-            color: #4caf50;
+            color: #4CAF50;
             font-weight: 600;
         }}
 
         .trend-down {{
-            color: #f44336;
+            color: #d32f2f;
             font-weight: 600;
         }}
 
         .trend-flat {{
-            color: #ffc107;
+            color: #f57c00;
         }}
 
         /* Section styling */
         .section {{
-            background: linear-gradient(145deg, #1e3a5f 0%, #1a2d47 100%);
-            border-radius: 12px;
+            background: white;
+            border-radius: 8px;
             padding: 25px;
             margin-bottom: 25px;
-            border: 1px solid #2d4a6f;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }}
 
         .section h2 {{
             font-size: 1.3em;
             font-weight: 500;
-            color: #4fc3f7;
+            color: #333;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #2d4a6f;
+            border-bottom: 2px solid #4CAF50;
         }}
 
         /* Grid layouts */
@@ -316,14 +316,14 @@ html = f"""
         .bar-label {{
             width: 100px;
             font-size: 0.9em;
-            color: #b0bec5;
+            color: #666;
             flex-shrink: 0;
         }}
 
         .bar-container {{
             flex-grow: 1;
             height: 24px;
-            background: #1a2d47;
+            background: #e8f5e9;
             border-radius: 4px;
             margin: 0 15px;
             overflow: hidden;
@@ -331,7 +331,7 @@ html = f"""
 
         .bar {{
             height: 100%;
-            background: linear-gradient(90deg, #4fc3f7 0%, #29b6f6 100%);
+            background: #4CAF50;
             border-radius: 4px;
             transition: width 0.5s ease;
         }}
@@ -340,7 +340,7 @@ html = f"""
             width: 80px;
             text-align: right;
             font-size: 0.9em;
-            color: #ffffff;
+            color: #333;
             font-weight: 500;
         }}
 
@@ -353,8 +353,8 @@ html = f"""
         th {{
             text-align: left;
             padding: 12px 15px;
-            background: #1a2d47;
-            color: #4fc3f7;
+            background: #4CAF50;
+            color: white;
             font-weight: 500;
             font-size: 0.85em;
             text-transform: uppercase;
@@ -363,12 +363,12 @@ html = f"""
 
         td {{
             padding: 12px 15px;
-            border-bottom: 1px solid #2d4a6f;
-            color: #e0e0e0;
+            border-bottom: 1px solid #ddd;
+            color: #333;
         }}
 
         tr:hover td {{
-            background: rgba(79, 195, 247, 0.1);
+            background: #f5f5f5;
         }}
 
         .text-right {{
@@ -376,20 +376,20 @@ html = f"""
         }}
 
         .positive {{
-            color: #4caf50;
+            color: #388e3c;
         }}
 
         .negative {{
-            color: #f44336;
+            color: #d32f2f;
         }}
 
         /* Footer */
         .footer {{
             text-align: center;
             padding: 30px;
-            color: #78909c;
+            color: #999;
             font-size: 0.9em;
-            border-top: 1px solid #2d4a6f;
+            border-top: 1px solid #ddd;
             margin-top: 30px;
         }}
 
