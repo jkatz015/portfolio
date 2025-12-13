@@ -155,10 +155,9 @@ def check_password() -> bool:
             </div>
             <div>
                 <h1 class="login-title">D.A.T.A.</h1>
-                <p class="login-subtitle">Dashboard & Analytics Tool</p>
+                <p class="login-subtitle"><strong>D</strong>ashboard & <strong>A</strong>nalytics <strong>T</strong>ool for <strong>A</strong>ccounting</p>
             </div>
         </div>
-        <p class="login-tagline">for Accounting</p>
         """, unsafe_allow_html=True)
 
         # Password form
@@ -193,7 +192,7 @@ def render_header():
             </div>
             <div>
                 <h1 style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #0f172a; letter-spacing: -0.025em;">D.A.T.A.</h1>
-                <p style="margin: 0; font-size: 0.75rem; color: #64748b;">Upload • Clean • Analyze • Visualize • Export</p>
+                <p style="margin: 0; font-size: 0.75rem; color: #64748b;"><strong>D</strong>ashboard & <strong>A</strong>nalytics <strong>T</strong>ool for <strong>A</strong>ccounting</p>
             </div>
         </div>
         """, unsafe_allow_html=True)
